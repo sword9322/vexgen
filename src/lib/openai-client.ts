@@ -51,6 +51,10 @@ export function getOpenAIClient(): OpenAI {
     apiKey,
     timeout: 90_000, // 90 seconds – enough for long Whisper jobs
     maxRetries: 1,   // one automatic retry on transient errors
+    // Force native fetch (Node.js 18+) instead of the bundled node-fetch.
+    // On Vercel/AWS Lambda, node-fetch causes ECONNRESET on TLS connections.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fetch: (globalThis as any).fetch,
   };
 
   if (proxyUrl) {
