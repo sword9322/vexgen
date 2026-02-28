@@ -293,8 +293,11 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Copyright */}
-          <div className="text-xs text-gray-400">
+          {/* Copyright + contact */}
+          <div className="flex flex-col items-center sm:items-end gap-0.5 text-xs text-gray-400">
+            <a href="mailto:hello@vox-prompt.com" className="hover:text-gray-600 transition-colors">
+              hello@vox-prompt.com
+            </a>
             <span>&copy; {new Date().getFullYear()} VoxPrompt</span>
           </div>
         </div>
