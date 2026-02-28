@@ -26,8 +26,8 @@ export const generateSchema = z.object({
     errorMap: () => ({ message: 'verbosity must be one of: short, medium, detailed' }),
   }),
 
-  language: z.enum(['auto', 'en', 'pt'], {
-    errorMap: () => ({ message: 'language must be one of: auto, en, pt' }),
+  language: z.enum(['auto', 'en', 'pt', 'ptbr', 'es', 'fr', 'de', 'it'], {
+    errorMap: () => ({ message: 'language must be one of: auto, en, pt, ptbr, es, fr, de, it' }),
   }),
 });
 

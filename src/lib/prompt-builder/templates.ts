@@ -127,7 +127,12 @@ export const VERBOSITY_INSTRUCTIONS: Record<Verbosity, string> = {
 // ────────────────────────────────────────────────────────────
 
 export const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
-  auto: 'Match the language used in the transcript. If it is in Portuguese, output in Portuguese; if in English, output in English.',
-  en: 'Output the prompt entirely in English, regardless of the transcript language.',
-  pt: 'Output the prompt entirely in European Portuguese (pt-PT), regardless of the transcript language.',
+  auto: 'Match the language used in the transcript. Detect the language automatically and output in that same language.',
+  en:   'Output the prompt entirely in English, regardless of the transcript language.',
+  pt:   'Output the prompt entirely in European Portuguese (pt-PT), regardless of the transcript language.',
+  ptbr: 'Output the prompt entirely in Brazilian Portuguese (pt-BR), regardless of the transcript language.',
+  es:   'Output the prompt entirely in Spanish (Castilian), regardless of the transcript language.',
+  fr:   'Output the prompt entirely in French, regardless of the transcript language.',
+  de:   'Output the prompt entirely in German, regardless of the transcript language.',
+  it:   'Output the prompt entirely in Italian, regardless of the transcript language.',
 };

@@ -27,7 +27,12 @@ const VERBOSITY_OPTIONS = [
 const LANGUAGE_OPTIONS = [
   { value: 'auto', label: '🌍 Auto — match transcript', description: 'Output language matches the transcript language' },
   { value: 'en',   label: '🇬🇧 English',                description: 'Always output in English' },
-  { value: 'pt',   label: '🇵🇹 Portuguese (pt-PT)',      description: 'Always output in European Portuguese' },
+  { value: 'pt',   label: '🇵🇹 Portuguese (PT)',         description: 'Always output in European Portuguese' },
+  { value: 'ptbr', label: '🇧🇷 Portuguese (BR)',         description: 'Always output in Brazilian Portuguese' },
+  { value: 'es',   label: '🇪🇸 Spanish',                 description: 'Always output in Spanish' },
+  { value: 'fr',   label: '🇫🇷 French',                  description: 'Always output in French' },
+  { value: 'de',   label: '🇩🇪 German',                  description: 'Always output in German' },
+  { value: 'it',   label: '🇮🇹 Italian',                 description: 'Always output in Italian' },
 ];
 
 export function PromptOptions({

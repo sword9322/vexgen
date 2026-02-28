@@ -18,7 +18,7 @@ export type ModelTarget = 'claude' | 'chatgpt' | 'universal';
 export type Verbosity = 'short' | 'medium' | 'detailed';
 
 /** Language for the generated prompt */
-export type Language = 'auto' | 'en' | 'pt';
+export type Language = 'auto' | 'en' | 'pt' | 'ptbr' | 'es' | 'fr' | 'de' | 'it';
 
 // ────────────────────────────────────────────────────────────
 // Transcription
