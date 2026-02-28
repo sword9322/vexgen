@@ -196,77 +196,63 @@ export function AudioRecorder({ onAudioReady }: AudioRecorderProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Canvas waveform */}
-      <canvas
-        ref={canvasRef}
-        width={600}
-        height={80}
-        className={[
-          'w-full rounded-lg',
-          state === 'recording' ? 'opacity-100' : 'opacity-40',
-          'bg-violet-50',
-        ].join(' ')}
-        style={{ imageRendering: 'crisp-edges' }}
-      />
 
-      {/* Controls */}
-      <div className="flex items-center gap-3 flex-wrap">
-        {state === 'idle' && (
-          <Button
-            onClick={startRecording}
-            icon={<MicIcon />}
-            size="lg"
-          >
+      {/* ── Idle: centered mic prompt ─────────────────── */}
+      {state === 'idle' && (
+        <div className="flex flex-col items-center gap-4 py-5">
+          <div className="w-16 h-16 rounded-full bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center">
+            <svg className="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.5A6.5 6.5 0 005.5 12V9a6.5 6.5 0 0113 0v3a6.5 6.5 0 01-6.5 6.5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.5V22M8 22h8" />
+            </svg>
+          </div>
+          <Button onClick={startRecording} icon={<MicIcon />} size="lg">
             Start Recording
           </Button>
-        )}
+          <p className="text-xs text-gray-400">Speak clearly · 10–60 seconds works best</p>
+        </div>
+      )}
 
-        {state === 'requesting' && (
-          <Button loading size="lg">
-            Requesting microphone…
-          </Button>
-        )}
+      {/* ── Requesting mic permission ─────────────────── */}
+      {state === 'requesting' && (
+        <div className="flex justify-center py-5">
+          <Button loading size="lg">Requesting microphone…</Button>
+        </div>
+      )}
 
-        {state === 'recording' && (
-          <>
-            {/* Pulsing red dot */}
+      {/* ── Recording: waveform + timer + stop ────────── */}
+      {state === 'recording' && (
+        <div className="flex flex-col gap-3">
+          <canvas
+            ref={canvasRef}
+            width={600}
+            height={80}
+            className="w-full rounded-lg bg-violet-50"
+            style={{ imageRendering: 'crisp-edges' }}
+          />
+          <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 text-sm font-medium text-red-600">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
               {formatTime(seconds)}
             </span>
-            <Button
-              onClick={stopRecording}
-              variant="danger"
-              icon={<StopIcon />}
-              size="lg"
-            >
+            <Button onClick={stopRecording} variant="danger" icon={<StopIcon />} size="lg">
               Stop
             </Button>
-          </>
-        )}
-
-        {state === 'stopped' && audioUrl && (
-          <>
-            <audio
-              controls
-              src={audioUrl}
-              className="h-9 max-w-xs flex-1 min-w-0"
-            />
-            <Button onClick={reset} variant="secondary" size="sm">
-              Re-record
-            </Button>
-          </>
-        )}
-      </div>
-
-      {/* Duration hint */}
-      {state === 'idle' && (
-        <p className="text-xs text-gray-400">
-          Tip: Speak clearly. 10–60 seconds works best.
-        </p>
+          </div>
+        </div>
       )}
 
-      {/* Error */}
+      {/* ── Stopped: playback + re-record ─────────────── */}
+      {state === 'stopped' && audioUrl && (
+        <div className="flex flex-col gap-3">
+          <audio controls src={audioUrl} className="w-full h-10" />
+          <Button onClick={reset} variant="secondary" size="sm">
+            Re-record
+          </Button>
+        </div>
+      )}
+
+      {/* ── Error ────────────────────────────────────── */}
       {error && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
           {error}

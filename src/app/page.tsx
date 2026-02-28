@@ -134,16 +134,16 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 space-y-6">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-5 sm:py-8 space-y-4 sm:space-y-6">
 
         {/* ── Hero ─────────────────────────────────────── */}
-        <div className="text-center pb-2">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+        <div className="text-center pb-1">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-snug">
             Turn Your Voice Into a Perfect AI Prompt
           </h1>
-          <p className="mt-2 text-sm text-gray-500 max-w-xl mx-auto">
-            Record or upload a short voice note. VoxPrompt transcribes it and transforms it into
-            a structured, high-quality prompt optimised for ChatGPT, Claude, or any LLM.
+          <p className="mt-1.5 text-xs sm:text-sm text-gray-500 max-w-xl mx-auto">
+            Record or upload a voice note. VoxPrompt transcribes it and transforms it into
+            a structured prompt for ChatGPT, Claude, or any LLM.
           </p>
         </div>
 
