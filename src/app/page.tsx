@@ -154,7 +154,7 @@ export default function Home() {
           done={!!audioBlob && step !== 'input'}
         >
           {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-gray-100 rounded-lg mb-4 w-fit">
+          <div className="flex gap-1 p-1 bg-gray-100 rounded-lg mb-4 w-fit mx-auto sm:mx-0">
             {(['record', 'upload'] as InputTab[]).map((tab) => (
               <button
                 key={tab}
@@ -318,7 +318,7 @@ function StepCard({
 }) {
   return (
     <Card>
-      <div className="flex items-center gap-2.5 mb-4">
+      <div className="flex items-center justify-center sm:justify-start gap-2.5 mb-4">
         <div
           className={[
             'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
