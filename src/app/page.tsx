@@ -293,11 +293,22 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Copyright + contact */}
-          <div className="flex flex-col items-center sm:items-end gap-0.5 text-xs text-gray-400">
-            <a href="mailto:hello@vox-prompt.com" className="hover:text-gray-600 transition-colors">
-              hello@vox-prompt.com
-            </a>
+          {/* Copyright + contact + social */}
+          <div className="flex flex-col items-center sm:items-end gap-1 text-xs text-gray-400">
+            <div className="flex items-center gap-3">
+              <a href="mailto:hello@vox-prompt.com" className="hover:text-gray-600 transition-colors">
+                hello@vox-prompt.com
+              </a>
+              <a
+                href="https://x.com/PromptVox"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-700 transition-colors"
+                aria-label="Follow VoxPrompt on X"
+              >
+                <XIcon />
+              </a>
+            </div>
             <span>&copy; {new Date().getFullYear()} VoxPrompt</span>
           </div>
         </div>
@@ -380,6 +391,14 @@ function SparklesIcon() {
   return (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 3l.45 2.25M12 3v2m6.55-2L18 5.25M3 12H5m14 0h2M5.636 5.636l1.414 1.414m10.9-1.414-1.414 1.414M12 12l-3.5 3.5m3.5-3.5 3.5 3.5M12 12V7m0 5v5" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );
 }
