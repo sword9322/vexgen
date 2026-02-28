@@ -145,6 +145,16 @@ export default function Home() {
             Record or upload a voice note. VoxPrompt transcribes it and transforms it into
             a structured prompt for ChatGPT, Claude, or any LLM.
           </p>
+          <p className="mt-1 text-xs text-gray-400">
+            Built for developers, marketers, researchers &amp; AI power users.
+          </p>
+          {/* Social proof */}
+          <div className="mt-3 flex justify-center">
+            <span className="inline-flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-full px-3 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+              Used by early AI builders &amp; indie hackers
+            </span>
+          </div>
         </div>
 
         {/* ── Step 1: Audio Input ──────────────────────── */}

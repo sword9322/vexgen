@@ -207,7 +207,7 @@ export function AudioRecorder({ onAudioReady }: AudioRecorderProps) {
             </svg>
           </div>
           <Button onClick={startRecording} icon={<MicIcon />} size="lg">
-            Start Recording
+            Record My Prompt
           </Button>
           <p className="text-xs text-gray-400">Speak clearly · 10–60 seconds works best</p>
         </div>
