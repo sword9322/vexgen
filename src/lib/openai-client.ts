@@ -47,14 +47,26 @@ export function getOpenAIClient(): OpenAI {
     process.env.https_proxy ||
     process.env.http_proxy;
 
+  // Undici (Node.js 18+ native fetch) requires `duplex:'half'` on requests
+  // that send a body. The OpenAI SDK doesn't add it when a custom fetch is
+  // provided, so we wrap it here. This also avoids the ECONNRESET caused by
+  // the bundled node-fetch on Vercel/AWS Lambda.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const nativeFetch: typeof fetch | undefined = typeof (globalThis as any).fetch === 'function'
+    ? (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const options = init?.body !== undefined
+          ? { ...init, duplex: 'half' } as unknown as RequestInit
+          : init;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (globalThis as any).fetch(url, options) as Promise<Response>;
+      }
+    : undefined;
+
   const clientOptions: ConstructorParameters<typeof OpenAI>[0] = {
     apiKey,
     timeout: 90_000, // 90 seconds – enough for long Whisper jobs
     maxRetries: 1,   // one automatic retry on transient errors
-    // Force native fetch (Node.js 18+) instead of the bundled node-fetch.
-    // On Vercel/AWS Lambda, node-fetch causes ECONNRESET on TLS connections.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    fetch: (globalThis as any).fetch,
+    ...(nativeFetch ? { fetch: nativeFetch } : {}),
   };
 
   if (proxyUrl) {
