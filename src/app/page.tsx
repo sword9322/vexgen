@@ -246,7 +246,7 @@ export default function Home() {
 
         {/* ── Hero ─────────────────────────────────────── */}
         <div className="text-center pb-1">
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-snug">
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-snug">
             Turn Your Voice Into a Perfect AI Prompt
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-gray-500 max-w-xl mx-auto">
@@ -263,7 +263,7 @@ export default function Home() {
         </div>
 
         {/* ── Auth status bar ──────────────────────────── */}
-        <div className="flex items-center justify-end gap-2.5 text-xs text-gray-500">
+        <div className="flex items-center justify-center sm:justify-end gap-2.5 text-xs text-gray-500">
           {user ? (
             <>
               <span className="truncate max-w-[160px]">{user.email}</span>
