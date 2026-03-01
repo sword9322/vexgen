@@ -67,10 +67,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generated
           { status: 401 }
         );
       }
-      const { data: allowed } = await supabase.rpc('use_free_generation', { p_user_id: userId });
-      if (!allowed) {
+      const { data: result } = await supabase.rpc('use_generation', { p_user_id: userId });
+      if (result === 'denied') {
         return NextResponse.json(
-          { error: 'Free usage limit reached. Upgrade to continue.', code: 'PAYWALL' },
+          { error: 'Usage limit reached. Buy more uses to continue.', code: 'PAYWALL' },
           { status: 402 }
         );
       }

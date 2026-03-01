@@ -45,24 +45,34 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     try {
       const supabase = getServiceClient();
-      const { error } = await supabase
+
+      // Grant 15 uses
+      const { error: rpcError } = await supabase.rpc('add_paid_uses', {
+        p_user_id: userId,
+        p_count: 15,
+      });
+
+      if (rpcError) {
+        console.error('[VoxPrompt] Webhook: add_paid_uses failed:', rpcError);
+        return NextResponse.json({ error: 'DB update failed.' }, { status: 500 });
+      }
+
+      // Store payment reference (non-fatal if it fails)
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({
-          is_paid: true,
-          paid_at: new Date().toISOString(),
           stripe_customer_id: session.customer as string | null,
-          stripe_payment_id: session.subscription as string | null,
+          stripe_payment_id: session.payment_intent as string | null,
+          paid_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', userId);
 
-      if (error) {
-        console.error('[VoxPrompt] Webhook: failed to update profile:', error);
-        // Return 500 so Stripe retries
-        return NextResponse.json({ error: 'DB update failed.' }, { status: 500 });
+      if (updateError) {
+        console.error('[VoxPrompt] Webhook: profile metadata update failed:', updateError);
       }
 
-      console.log(`[VoxPrompt] Webhook: user ${userId} marked as paid`);
+      console.log(`[VoxPrompt] Webhook: granted 15 uses to user ${userId}`);
     } catch (err) {
       console.error('[VoxPrompt] Webhook: unexpected error:', err);
       return NextResponse.json({ error: 'Internal error.' }, { status: 500 });

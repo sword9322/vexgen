@@ -25,12 +25,12 @@ export function PaywallCard({ code, isLoggedIn, onSignIn, onPay, isPayLoading }:
         {/* Text */}
         <div className="flex-1">
           <p className="font-semibold text-gray-900 text-sm">
-            You&apos;ve used your 2 free generations
+            You&apos;ve used all your free generations
           </p>
           <p className="text-xs text-gray-500 mt-0.5">
             {showSignUp
-              ? 'Create a free account for 2 more uses, or subscribe for $5/month for unlimited access.'
-              : 'Subscribe for $5/month and get unlimited access — cancel anytime.'}
+              ? 'Create a free account for 2 more uses, or buy 15 generations for $5.'
+              : 'Buy 15 more generations for $5 — no subscription, pay again when you run out.'}
           </p>
         </div>
 
@@ -42,7 +42,7 @@ export function PaywallCard({ code, isLoggedIn, onSignIn, onPay, isPayLoading }:
             </Button>
           )}
           <Button onClick={onPay} size="sm" loading={isPayLoading}>
-            $5/month — Unlimited
+            $5 — 15 generations
           </Button>
         </div>
       </div>

@@ -60,6 +60,21 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [usesLeft, setUsesLeft] = useState<number | null>(null);
+
+  const fetchProfile = async (token: string) => {
+    try {
+      const res = await fetch('/api/profile', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsesLeft(data.total_uses_remaining);
+      }
+    } catch {
+      // ignore — non-critical
+    }
+  };
 
   // Listen to Supabase auth state (magic link flow handled automatically by the JS client)
   useEffect(() => {
@@ -70,6 +85,7 @@ export default function Home() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setAccessToken(session?.access_token ?? null);
+      if (session?.access_token) fetchProfile(session.access_token);
     });
 
     // Subscribe to auth state changes (sign-in after magic link click lands here)
@@ -77,6 +93,8 @@ export default function Home() {
       setUser(session?.user ?? null);
       setAccessToken(session?.access_token ?? null);
       if (session?.user) setShowAuthModal(false);
+      if (session?.access_token) fetchProfile(session.access_token);
+      if (!session) setUsesLeft(null);
     });
 
     return () => subscription.unsubscribe();
@@ -166,6 +184,7 @@ export default function Home() {
 
       setResult(data as GeneratedPrompt);
       setStep('done');
+      if (accessToken) fetchProfile(accessToken);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Generation failed. Please try again.';
       setGenerateError(msg);
@@ -221,7 +240,7 @@ export default function Home() {
         {paymentSuccess && (
           <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800">
             <span className="text-lg">🎉</span>
-            <span>Subscription active — you now have <strong>unlimited access</strong>. Generate away!</span>
+            <span>Payment successful — <strong>15 generations</strong> added to your account. Generate away!</span>
           </div>
         )}
 
@@ -245,11 +264,25 @@ export default function Home() {
 
         {/* ── Auth status bar ──────────────────────────── */}
         {user && (
-          <div className="flex items-center justify-end gap-2 text-xs text-gray-500">
-            <span className="truncate max-w-[180px]">{user.email}</span>
+          <div className="flex items-center justify-end gap-2.5 text-xs text-gray-500">
+            <span className="truncate max-w-[160px]">{user.email}</span>
+            {usesLeft !== null && (
+              <span
+                className={[
+                  'px-2 py-0.5 rounded-full font-medium border',
+                  usesLeft === 0
+                    ? 'bg-red-50 text-red-600 border-red-100'
+                    : usesLeft <= 3
+                    ? 'bg-amber-50 text-amber-700 border-amber-100'
+                    : 'bg-indigo-50 text-indigo-600 border-indigo-100',
+                ].join(' ')}
+              >
+                {usesLeft} {usesLeft === 1 ? 'use' : 'uses'} left
+              </span>
+            )}
             <button
               onClick={handleSignOut}
-              className="text-indigo-600 hover:underline shrink-0"
+              className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
             >
               Sign out
             </button>
