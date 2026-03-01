@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { AudioRecorder } from '@/components/AudioRecorder';
 import { AudioUploader } from '@/components/AudioUploader';
@@ -8,8 +8,12 @@ import { TranscriptEditor } from '@/components/TranscriptEditor';
 import { TemplateSelector } from '@/components/TemplateSelector';
 import { PromptOptions } from '@/components/PromptOptions';
 import { PromptOutput } from '@/components/PromptOutput';
+import { PaywallCard } from '@/components/PaywallCard';
+import { AuthModal } from '@/components/AuthModal';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { getSupabaseBrowser } from '@/lib/supabase/browser';
+import type { User } from '@supabase/supabase-js';
 import type {
   PromptTemplate,
   ModelTarget,
@@ -49,17 +53,58 @@ export default function Home() {
   // Step
   const [step, setStep] = useState<AppStep>('input');
 
+  // ── Auth + paywall state ──────────────────────────────────
+  const [user, setUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [paywallCode, setPaywallCode] = useState<'PAYWALL' | 'PAYWALL_ANON' | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  // Listen to Supabase auth state (magic link flow handled automatically by the JS client)
+  useEffect(() => {
+    const supabase = getSupabaseBrowser();
+    if (!supabase) return;
+
+    // Restore session on load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setAccessToken(session?.access_token ?? null);
+    });
+
+    // Subscribe to auth state changes (sign-in after magic link click lands here)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAccessToken(session?.access_token ?? null);
+      if (session?.user) setShowAuthModal(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Show payment success banner when returning from Stripe
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') === 'success') {
+      setPaymentSuccess(true);
+      params.delete('payment');
+      const clean = params.toString() ? `?${params}` : window.location.pathname;
+      window.history.replaceState({}, '', clean);
+    }
+  }, []);
+
   // ── Handlers ─────────────────────────────────────────────
 
   const handleAudioReady = (blob: Blob, _url: string) => {
     setAudioBlob(blob);
     setAudioMime(blob.type || 'audio/webm');
-    // Reset downstream state when new audio comes in
     setTranscription(null);
     setTranscript('');
     setResult(null);
     setTranscribeError(null);
     setGenerateError(null);
+    setPaywallCode(null);
     setStep('input');
   };
 
@@ -70,7 +115,6 @@ export default function Home() {
 
     try {
       const form = new FormData();
-      // Give the file a proper extension based on mime type
       const ext = mimeToExt(audioMime);
       form.append('audio', new File([audioBlob], `recording.${ext}`, { type: audioMime }));
 
@@ -95,15 +139,26 @@ export default function Home() {
   const handleGenerate = async () => {
     if (!transcript.trim()) return;
     setGenerateError(null);
+    setPaywallCode(null);
     setStep('generating');
 
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
       const res = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ transcript, template, modelTarget, verbosity, language }),
       });
       const data = await res.json();
+
+      // ── Paywall hit ───────────────────────────────────────
+      if (data.code === 'PAYWALL' || data.code === 'PAYWALL_ANON') {
+        setPaywallCode(data.code as 'PAYWALL' | 'PAYWALL_ANON');
+        setStep('editing');
+        return;
+      }
 
       if (!res.ok) {
         throw new Error(data.error ?? `Server error ${res.status}`);
@@ -118,6 +173,31 @@ export default function Home() {
     }
   };
 
+  const handleStartCheckout = async () => {
+    if (!accessToken) {
+      setShowAuthModal(true);
+      return;
+    }
+    setIsCheckingOut(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch (err) {
+      console.error('[VoxPrompt] Checkout error:', err);
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    const supabase = getSupabaseBrowser();
+    if (supabase) await supabase.auth.signOut();
+  };
+
   const handleReset = () => {
     setAudioBlob(null);
     setTranscription(null);
@@ -125,6 +205,7 @@ export default function Home() {
     setResult(null);
     setTranscribeError(null);
     setGenerateError(null);
+    setPaywallCode(null);
     setStep('input');
   };
 
@@ -136,6 +217,14 @@ export default function Home() {
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-5 sm:py-8 space-y-4 sm:space-y-6">
 
+        {/* ── Payment success banner ───────────────────── */}
+        {paymentSuccess && (
+          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800">
+            <span className="text-lg">🎉</span>
+            <span>Payment successful — you now have <strong>unlimited access</strong>. Generate away!</span>
+          </div>
+        )}
+
         {/* ── Hero ─────────────────────────────────────── */}
         <div className="text-center pb-1">
           <h1 className="text-xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-snug">
@@ -145,9 +234,6 @@ export default function Home() {
             Record or upload a voice note. VoxPrompt transcribes it and transforms it into
             a structured prompt for ChatGPT, Claude, or any LLM.
           </p>
-          <p className="mt-1 text-xs text-gray-400">
-            Built for developers, marketers, researchers &amp; AI power users.
-          </p>
           {/* Social proof */}
           <div className="mt-3 flex justify-center">
             <span className="inline-flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-full px-3 py-1">
@@ -156,6 +242,19 @@ export default function Home() {
             </span>
           </div>
         </div>
+
+        {/* ── Auth status bar ──────────────────────────── */}
+        {user && (
+          <div className="flex items-center justify-end gap-2 text-xs text-gray-500">
+            <span className="truncate max-w-[180px]">{user.email}</span>
+            <button
+              onClick={handleSignOut}
+              className="text-indigo-600 hover:underline shrink-0"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
 
         {/* ── Step 1: Audio Input ──────────────────────── */}
         <StepCard
@@ -261,7 +360,19 @@ export default function Home() {
                   )}
                 </div>
 
+                {/* Error banner (non-paywall errors) */}
                 {generateError && <ErrorBanner message={generateError} />}
+
+                {/* Paywall card */}
+                {paywallCode && (
+                  <PaywallCard
+                    code={paywallCode}
+                    isLoggedIn={!!user}
+                    onSignIn={() => setShowAuthModal(true)}
+                    onPay={handleStartCheckout}
+                    isPayLoading={isCheckingOut}
+                  />
+                )}
               </div>
             </StepCard>
           </div>
@@ -323,6 +434,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ── Auth modal ────────────────────────────────── */}
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 }

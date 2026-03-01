@@ -1,27 +1,21 @@
 'use client';
 
+import Image from 'next/image';
+
 export function Header() {
   return (
     <header className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         {/* Logo + name */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-sm">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.2}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 18.5A6.5 6.5 0 005.5 12V9a6.5 6.5 0 0113 0v3a6.5 6.5 0 01-6.5 6.5z"
-              />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.5V22M8 22h8" />
-            </svg>
-          </div>
+          <Image
+            src="/logo.png"
+            alt="VoxPrompt logo"
+            width={32}
+            height={32}
+            className="rounded-lg"
+            priority
+          />
           <div>
             <span className="text-base font-bold text-gray-900 tracking-tight">VoxPrompt</span>
             <span className="hidden sm:inline ml-2 text-xs font-medium text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full">

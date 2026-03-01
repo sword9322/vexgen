@@ -83,6 +83,13 @@ export interface ExtractedData {
 }
 
 // ────────────────────────────────────────────────────────────
+// Paywall
+// ────────────────────────────────────────────────────────────
+
+/** Returned by /api/generate when the free quota is exhausted. */
+export type PaywallCode = 'PAYWALL' | 'PAYWALL_ANON';
+
+// ────────────────────────────────────────────────────────────
 // API error shape
 // ────────────────────────────────────────────────────────────
 

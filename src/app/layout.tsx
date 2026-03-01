@@ -15,6 +15,10 @@ export const metadata: Metadata = {
     'Record or upload a voice message and transform it into a high-quality, structured AI prompt in seconds.',
   keywords: ['AI prompt', 'voice transcription', 'ChatGPT', 'Claude', 'Whisper', 'prompt engineering'],
   authors: [{ name: 'VoxPrompt' }],
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: 'VoxPrompt — Voice to AI Prompt',
     description: 'Record your voice, get a perfect AI prompt.',
