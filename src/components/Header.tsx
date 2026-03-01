@@ -27,7 +27,7 @@ export function Header({ user, usesLeft, onSignIn, onSignOut }: HeaderProps) {
           <div>
             <span className="text-base font-bold text-gray-900 tracking-tight">VoxPrompt</span>
             <span className="hidden sm:inline ml-2 text-xs font-medium text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full">
-              MVP · v0.1.0
+              MVP · v1.10.0
             </span>
           </div>
         </div>
