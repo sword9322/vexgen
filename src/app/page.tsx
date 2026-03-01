@@ -263,31 +263,40 @@ export default function Home() {
         </div>
 
         {/* ── Auth status bar ──────────────────────────── */}
-        {user && (
-          <div className="flex items-center justify-end gap-2.5 text-xs text-gray-500">
-            <span className="truncate max-w-[160px]">{user.email}</span>
-            {usesLeft !== null && (
-              <span
-                className={[
-                  'px-2 py-0.5 rounded-full font-medium border',
-                  usesLeft === 0
-                    ? 'bg-red-50 text-red-600 border-red-100'
-                    : usesLeft <= 3
-                    ? 'bg-amber-50 text-amber-700 border-amber-100'
-                    : 'bg-indigo-50 text-indigo-600 border-indigo-100',
-                ].join(' ')}
+        <div className="flex items-center justify-end gap-2.5 text-xs text-gray-500">
+          {user ? (
+            <>
+              <span className="truncate max-w-[160px]">{user.email}</span>
+              {usesLeft !== null && (
+                <span
+                  className={[
+                    'px-2 py-0.5 rounded-full font-medium border',
+                    usesLeft === 0
+                      ? 'bg-red-50 text-red-600 border-red-100'
+                      : usesLeft <= 3
+                      ? 'bg-amber-50 text-amber-700 border-amber-100'
+                      : 'bg-indigo-50 text-indigo-600 border-indigo-100',
+                  ].join(' ')}
+                >
+                  {usesLeft} {usesLeft === 1 ? 'use' : 'uses'} left
+                </span>
+              )}
+              <button
+                onClick={handleSignOut}
+                className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
               >
-                {usesLeft} {usesLeft === 1 ? 'use' : 'uses'} left
-              </span>
-            )}
+                Sign out
+              </button>
+            </>
+          ) : (
             <button
-              onClick={handleSignOut}
-              className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+              onClick={() => setShowAuthModal(true)}
+              className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 transition-colors"
             >
-              Sign out
+              Sign in / Sign up
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* ── Step 1: Audio Input ──────────────────────── */}
         <StepCard
