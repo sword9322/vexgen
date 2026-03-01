@@ -278,10 +278,12 @@ export default function Home() {
             </span>
           </div>
 
-          {/* API key opt-in */}
-          <div className="mt-4">
-            <ApiKeyInput apiKey={apiKey} onChange={setApiKey} />
-          </div>
+          {/* API key opt-in — only for signed-in users */}
+          {user && (
+            <div className="mt-4">
+              <ApiKeyInput apiKey={apiKey} onChange={setApiKey} />
+            </div>
+          )}
         </div>
 
         {/* ── Step 1: Audio Input ──────────────────────── */}
