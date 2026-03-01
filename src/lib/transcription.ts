@@ -30,9 +30,10 @@ function sanitiseMime(raw: string): string {
 export async function transcribeAudio(
   audioBuffer: Buffer,
   filename: string,
-  mimeType: string
+  mimeType: string,
+  userApiKey?: string
 ): Promise<TranscriptionResult> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = userApiKey || process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error(
       'OPENAI_API_KEY is not set.\n' +

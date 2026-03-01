@@ -49,6 +49,24 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generated
     );
   }
 
+  // ── User-supplied OpenAI key — skip paywall entirely ─────
+  const userKey = request.headers.get('X-OpenAI-Key') || undefined;
+  if (userKey) {
+    try {
+      const result = await generatePrompt(parsed.data, userKey);
+      return NextResponse.json(result, {
+        headers: {
+          'X-RateLimit-Remaining': String(rl.remaining),
+          'X-RateLimit-Limit': String(rl.limit),
+          'X-Used-AI': result.metadata.usedAI ? '1' : '0',
+        },
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Prompt generation failed.';
+      return NextResponse.json({ error: message, code: 'GENERATION_ERROR' }, { status: 500 });
+    }
+  }
+
   // ── Paywall check ────────────────────────────────────────
   // newAnonId is set when we create a fresh cookie; we attach it to the response.
   let newAnonId: string | null = null;
@@ -98,7 +116,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generated
   // ── Generate prompt ───────────────────────────────────────
   try {
     const result = await generatePrompt(parsed.data);
-    const response = NextResponse.json(result, {
+    const response = NextResponse.json(result, { // platform key used via env var
       headers: {
         'X-RateLimit-Remaining': String(rl.remaining),
         'X-RateLimit-Limit': String(rl.limit),

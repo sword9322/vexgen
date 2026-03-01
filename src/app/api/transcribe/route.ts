@@ -88,11 +88,14 @@ export async function POST(request: Request): Promise<NextResponse<Transcription
   }
 
   // ── Transcribe ────────────────────────────────────────────
+  const userKey = request.headers.get('X-OpenAI-Key') || undefined;
+
   try {
     const result = await transcribeAudio(
       audioBuffer,
       audioFile.name || 'recording.webm',
-      audioFile.type
+      audioFile.type,
+      userKey
     );
 
     if (!result.transcript || result.transcript.trim().length === 0) {

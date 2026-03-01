@@ -10,6 +10,7 @@ import { PromptOptions } from '@/components/PromptOptions';
 import { PromptOutput } from '@/components/PromptOutput';
 import { PaywallCard } from '@/components/PaywallCard';
 import { AuthModal } from '@/components/AuthModal';
+import { ApiKeyInput, loadApiKey } from '@/components/ApiKeyInput';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { getSupabaseBrowser } from '@/lib/supabase/browser';
@@ -52,6 +53,13 @@ export default function Home() {
 
   // Step
   const [step, setStep] = useState<AppStep>('input');
+
+  // ── API key state (loaded from localStorage on mount) ────
+  const [apiKey, setApiKey] = useState<string>('');
+
+  useEffect(() => {
+    setApiKey(loadApiKey());
+  }, []);
 
   // ── Auth + paywall state ──────────────────────────────────
   const [user, setUser] = useState<User | null>(null);
@@ -136,7 +144,10 @@ export default function Home() {
       const ext = mimeToExt(audioMime);
       form.append('audio', new File([audioBlob], `recording.${ext}`, { type: audioMime }));
 
-      const res = await fetch('/api/transcribe', { method: 'POST', body: form });
+      const transcribeHeaders: Record<string, string> = {};
+      if (apiKey) transcribeHeaders['X-OpenAI-Key'] = apiKey;
+
+      const res = await fetch('/api/transcribe', { method: 'POST', headers: transcribeHeaders, body: form });
       const data = await res.json();
 
       if (!res.ok) {
@@ -163,6 +174,7 @@ export default function Home() {
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+      if (apiKey) headers['X-OpenAI-Key'] = apiKey;
 
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -264,6 +276,11 @@ export default function Home() {
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
               Used by early AI builders &amp; indie hackers
             </span>
+          </div>
+
+          {/* API key opt-in */}
+          <div className="mt-4">
+            <ApiKeyInput apiKey={apiKey} onChange={setApiKey} />
           </div>
         </div>
 

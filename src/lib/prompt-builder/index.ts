@@ -13,12 +13,11 @@ import { buildPrompt } from './formatter';
 import { TEMPLATES, MODEL_INSTRUCTIONS, VERBOSITY_INSTRUCTIONS, LANGUAGE_INSTRUCTIONS } from './templates';
 import { getOpenAIClient } from '../openai-client';
 
-function getClient(): OpenAI | null {
-  // Skip AI path if no key is configured (placeholder counts as missing)
-  const key = process.env.OPENAI_API_KEY;
+function getClient(userApiKey?: string): OpenAI | null {
+  const key = userApiKey || process.env.OPENAI_API_KEY;
   if (!key || key === 'sk-...' || key.startsWith('sk-...')) return null;
   try {
-    return getOpenAIClient();
+    return userApiKey ? new OpenAI({ apiKey: userApiKey }) : getOpenAIClient();
   } catch {
     return null;
   }
@@ -34,9 +33,11 @@ function getClient(): OpenAI | null {
  * Strategy:
  * 1. Try GPT-4o-mini with a carefully crafted system prompt.
  * 2. On failure (or missing API key) → deterministic builder.
+ *
+ * @param userApiKey  Optional user-supplied OpenAI key (bypasses paywall).
  */
-export async function generatePrompt(options: GenerateOptions): Promise<GeneratedPrompt> {
-  const client = getClient();
+export async function generatePrompt(options: GenerateOptions, userApiKey?: string): Promise<GeneratedPrompt> {
+  const client = getClient(userApiKey);
 
   if (client) {
     try {
