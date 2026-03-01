@@ -51,7 +51,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           is_paid: true,
           paid_at: new Date().toISOString(),
           stripe_customer_id: session.customer as string | null,
-          stripe_payment_id: session.payment_intent as string | null,
+          stripe_payment_id: session.subscription as string | null,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', userId);

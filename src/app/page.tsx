@@ -221,7 +221,7 @@ export default function Home() {
         {paymentSuccess && (
           <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800">
             <span className="text-lg">🎉</span>
-            <span>Payment successful — you now have <strong>unlimited access</strong>. Generate away!</span>
+            <span>Subscription active — you now have <strong>unlimited access</strong>. Generate away!</span>
           </div>
         )}
 

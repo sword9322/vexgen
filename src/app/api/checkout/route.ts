@@ -1,6 +1,6 @@
 // ============================================================
 // POST /api/checkout
-// Creates a Stripe Checkout session for a $5 one-time payment.
+// Creates a Stripe Checkout session for a $5/month subscription.
 // Requires an authenticated user (Bearer token).
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,17 +29,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ url: st
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
   const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
+    mode: 'subscription',
     payment_method_types: ['card'],
-    customer_creation: 'always',
     line_items: [
       {
         price_data: {
           currency: 'usd',
           unit_amount: 500, // $5.00
+          recurring: { interval: 'month' },
           product_data: {
             name: 'VoxPrompt — Unlimited Access',
-            description: 'Unlimited AI prompt generations',
+            description: 'Unlimited AI prompt generations · cancel anytime',
           },
         },
         quantity: 1,

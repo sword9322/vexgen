@@ -29,8 +29,8 @@ export function PaywallCard({ code, isLoggedIn, onSignIn, onPay, isPayLoading }:
           </p>
           <p className="text-xs text-gray-500 mt-0.5">
             {showSignUp
-              ? 'Create a free account for 2 more uses, or pay $5 for unlimited access.'
-              : 'Pay once and get unlimited access — no subscription.'}
+              ? 'Create a free account for 2 more uses, or subscribe for $5/month for unlimited access.'
+              : 'Subscribe for $5/month and get unlimited access — cancel anytime.'}
           </p>
         </div>
 
@@ -42,7 +42,7 @@ export function PaywallCard({ code, isLoggedIn, onSignIn, onPay, isPayLoading }:
             </Button>
           )}
           <Button onClick={onPay} size="sm" loading={isPayLoading}>
-            Pay $5 — Unlimited
+            $5/month — Unlimited
           </Button>
         </div>
       </div>
